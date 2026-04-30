@@ -1,0 +1,45 @@
+services:
+  db:
+    image: mariadb:10.11
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: wp
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_password
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network      
+
+  wp:
+    image: wordpress:latest
+    ports:
+      - "9090:80"
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_password
+      WORDPRESS_DB_NAME: wp
+    depends_on:
+      - db
+    volumes:
+      - wp_data:/var/www/html
+    networks:
+      - app-network      
+  
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "9091:8080"
+    networks:
+      - app-network      
+
+networks:
+  app-network:
+    driver: bridge      
+
+volumes:
+  db_data:
+  wp_data:
